@@ -1,0 +1,33 @@
+version: "3.7"
+
+services:
+
+  flask:
+    build: ./flask
+    container_name: flask
+    restart: always
+    environment:
+      - APP_NAME=MyFlaskApp
+    expose:
+      # exposes the flask app to the other containers 
+      # or services in the same network 
+      - 8080
+
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    restart: always
+    ports:
+      # host:container
+      # any request that hits the app from port 80
+      # and since in nginx.conf we have a proxy maped from 80 to the proxy for flask app at port 8080
+      - "80:80"
+
+  mysqldb:
+    build: ./mysql
+    container_name: mysqldb
+    command: --init-file /data/application/init.sql
+    volumes:
+        - ./init.sql:/data/application/init.sql
+    env_file:
+        - .env
